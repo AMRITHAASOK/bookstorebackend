@@ -8,11 +8,11 @@ const jwtMiddleware = (req,res,next)=>{
         //token verification
         const tokenVerify = jwt.verify(token,'superkey2025')
         console.log(tokenVerify);
-        
-
+        req.payload = tokenVerify
+  next()
     }catch(err){
         res.status(401).json("Authorization Failed....")
     }
-    next()
+  
 }
 module.exports=jwtMiddleware
