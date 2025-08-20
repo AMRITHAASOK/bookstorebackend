@@ -15,9 +15,7 @@ const db = require('./config/db')
 const bookServer = express()
 
 //6 implementing cors 
-// bookServer.use(cors({
-//   origin: 'https://bookstore-frontend-mar-25.vercel.app',
-//   }))
+
 const allowedOrigins = [
   'http://localhost:3000',
   'https://bookstore-frontend-mar-25.vercel.app'
