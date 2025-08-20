@@ -188,7 +188,9 @@ console.log(session);
 
     }
        catch(err){
-     res.status(500).json("Err"+err)
+         console.error('Payment error:', err);
+    res.status(500).json({ error: 'Payment processing failed' });
+    //  res.status(500).json("Err"+err)
   }
     
 
