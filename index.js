@@ -15,7 +15,12 @@ const db = require('./config/db')
 const bookServer = express()
 
 //6 implementing cors 
-bookServer.use(cors())
+bookServer.use(cors({
+  origin: 'https://bookstore-frontend-mar-25.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // adjust as needed
+  credentials: true // only if you're using cookies or auth headers
+}))
+
 //7 implementing middleware
 bookServer.use(express.json()) // Returns middleware that only parses json
 // bookServer.use(appMiddleware)
