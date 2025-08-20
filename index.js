@@ -20,6 +20,8 @@ bookServer.use(cors())
 bookServer.use(express.json()) // Returns middleware that only parses json
 // bookServer.use(appMiddleware)
 bookServer.use(route)
+bookServer.use('/upload',express.static('./uploads'))
+
 //3 Define port 
 PORT = 3000 || process.env.PORT 
 

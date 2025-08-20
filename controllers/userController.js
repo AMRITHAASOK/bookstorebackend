@@ -80,3 +80,57 @@ exports.googleAuth = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+
+exports.getAllUsersAdminController=async(req,res)=>{
+  const email = req.payload.userMail
+  try{
+
+    const allExistingUser = await users.find({email:{$ne:email}})
+     res.status(200).json(allExistingUser)
+  }catch(err){
+     res.status(500).json("Err"+err)
+  }
+}
+
+
+exports.updateAdminDetails=async(req,res)=>{
+
+  console.log("Inside Admin profile update");
+  const {username,password,profile} = req.body
+  const pro = req.file ? req.file.filename : profile
+  const email = req.payload.userMail
+  console.log(username , password , pro , email);
+
+  try{
+        const adminDetails = await users.findOneAndUpdate({email},{username,email,password,profile:pro},{new:true})
+        await adminDetails.save()
+        res.status(200).json(adminDetails)
+  }
+  catch(err){
+         res.status(500).json("Err"+err)
+
+  }
+  
+  
+}
+
+exports.getAdminDetails=async(req,res)=>{
+  console.log("Admin details");
+  
+  const email = req.payload.userMail
+  try{
+
+    const adminDetails = await users.find({email,bio:"Admin"})
+    if(!adminDetails){
+      res.status(404).json({message:"Not found"})
+    }
+    else{
+      res.status(200).json(adminDetails)
+    }
+     
+  }catch(err){
+     res.status(500).json("Err"+err)
+  }
+}
+
