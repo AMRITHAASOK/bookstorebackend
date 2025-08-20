@@ -1,5 +1,6 @@
 const books= require("../models/bookModel");
-const stripe = require('stripe')('sk_test_51RxOltH3QduXbQSD0m23So3t4VwzPTMt6jiIZ3NDj4F3VNsOY71kEKhgwKgeKHnc4O1JQy2RDZbbUKiGhb2WU5NJ00hUkV49Yb');
+const stripe = require('stripe')(process.env.stripeKey)
+
 
 
 exports.addBook=async(req,res)=>{
