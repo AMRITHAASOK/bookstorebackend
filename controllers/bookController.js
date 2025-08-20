@@ -111,87 +111,163 @@ exports.approveBooksAdminController=async(req,res)=>{
 
 }
 
+// const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-exports.makepayment=async(req,res)=>{
+exports.makepayment = async (req, res) => {
   console.log("inside make payment");
-    const {bookDetails} = req.body
-    console.log(bookDetails);
-    const email = req.payload.userMail
-    console.log(email);
-    try{
-      const existingBook = await books.findByIdAndUpdate({_id:bookDetails._id},{
-        title:bookDetails.title,
-        author:bookDetails.author,
-        noofpages:bookDetails.noofpages,
-        imageUrl:bookDetails.imageUrl,
-        price:bookDetails.price,
-        dprice:bookDetails.dprice,
-        abstract:bookDetails.abstract,
-        publisher:bookDetails.publisher,
-        language:bookDetails.language,
-        isbn:bookDetails.isbn,
-        category:bookDetails.category, 
-        UploadedImages:bookDetails.UploadedImages,
-        status:'sold',
-        userMail:bookDetails.userMail,
-        brought:email
-      },{new:true})
-      console.log(existingBook);
+  const { bookDetails } = req.body;
+  const email = req.payload.userMail;
 
-      line_item = [{
-        price_data:{
-          currency:'usd',
-          product_data:{
-            name:bookDetails.title,
-            description : `${bookDetails.author} | ${bookDetails.publisher}`,
-            images:[bookDetails.imageUrl],
-            metadata:{
-        title:bookDetails.title,
-        author:bookDetails.author,
-        noofpages:bookDetails.noofpages,
-        imageUrl:bookDetails.imageUrl,
-        price:bookDetails.price,
-        dprice:bookDetails.dprice,
-        abstract:bookDetails.abstract,
-        publisher:bookDetails.publisher,
-        language:bookDetails.language,
-        isbn:bookDetails.isbn,
-        category:bookDetails.category, 
-        UploadedImages:bookDetails.UploadedImages,
-        status:'sold',
-        userMail:bookDetails.userMail,
-        brought:email
-            }
+  try {
+    const existingBook = await books.findByIdAndUpdate(
+      bookDetails._id,
+      {
+        title: bookDetails.title,
+        author: bookDetails.author,
+        noofpages: bookDetails.noofpages,
+        imageUrl: bookDetails.imageUrl,
+        price: bookDetails.price,
+        dprice: bookDetails.dprice,
+        abstract: bookDetails.abstract,
+        publisher: bookDetails.publisher,
+        language: bookDetails.language,
+        isbn: bookDetails.isbn,
+        category: bookDetails.category,
+        UploadedImages: bookDetails.UploadedImages,
+        status: "sold",
+        userMail: bookDetails.userMail,
+        brought: email,
+      },
+      { new: true }
+    );
+
+    const line_items = [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: bookDetails.title,
+            description: `${bookDetails.author} | ${bookDetails.publisher}`,
+            images: [bookDetails.imageUrl],
+            metadata: {
+              title: bookDetails.title,
+              author: bookDetails.author,
+              noofpages: bookDetails.noofpages,
+              imageUrl: bookDetails.imageUrl,
+              price: bookDetails.price,
+              dprice: bookDetails.dprice,
+              abstract: bookDetails.abstract,
+              publisher: bookDetails.publisher,
+              language: bookDetails.language,
+              isbn: bookDetails.isbn,
+              category: bookDetails.category,
+              UploadedImages: bookDetails.UploadedImages,
+              status: "sold",
+              userMail: bookDetails.userMail,
+              brought: email,
+            },
           },
-          //doller convertion
-          unit_amount:Math.round(bookDetails.dprice*100)
+          unit_amount: Math.round(Number(bookDetails.dprice) * 100),
         },
-          quantity:1
-      }]
+        quantity: 1,
+      },
+    ];
 
-      //create stripe checkout session
-     const session = await stripe.checkout.sessions.create({
-        //purchase using card
-         payment_method_types: ["card"],
-         //details of Book
-         line_items: line_item,
-          //make payment
-          mode: "payment",
-          //if payment is successfull, then redired to payment success
-          success_url: 'https://bookstore-frontend-mar-25.vercel.app/payment-success',
-        //if payment is unsuccessfull, then redired to payment error
-          cancel_url:'https://bookstore-frontend-mar-25.vercel.app/payment-error'
-        
-});
-console.log(session);
- res.status(200).json({sessionID:session.id,existingBook})
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items,
+      mode: "payment",
+      success_url: "https://bookstore-frontend-mar-25.vercel.app/payment-success",
+      cancel_url: "https://bookstore-frontend-mar-25.vercel.app/payment-error",
+    });
 
-    }
-       catch(err){
-         console.error('Payment error:', err);
-    res.status(500).json({ error: 'Payment processing failed' });
-    //  res.status(500).json("Err"+err)
+    res.status(200).json({ sessionID: session.id, existingBook });
+  } catch (err) {
+    console.error("Payment error:", err);
+    res.status(500).json({ error: err.message });
   }
+};
+
+// exports.makepayment=async(req,res)=>{
+//   console.log("inside make payment");
+//     const {bookDetails} = req.body
+//     console.log(bookDetails);
+//     const email = req.payload.userMail
+//     console.log(email);
+//     try{
+//       const existingBook = await books.findByIdAndUpdate({_id:bookDetails._id},{
+//         title:bookDetails.title,
+//         author:bookDetails.author,
+//         noofpages:bookDetails.noofpages,
+//         imageUrl:bookDetails.imageUrl,
+//         price:bookDetails.price,
+//         dprice:bookDetails.dprice,
+//         abstract:bookDetails.abstract,
+//         publisher:bookDetails.publisher,
+//         language:bookDetails.language,
+//         isbn:bookDetails.isbn,
+//         category:bookDetails.category, 
+//         UploadedImages:bookDetails.UploadedImages,
+//         status:'sold',
+//         userMail:bookDetails.userMail,
+//         brought:email
+//       },{new:true})
+//       console.log(existingBook);
+
+//       line_item = [{
+//         price_data:{
+//           currency:'usd',
+//           product_data:{
+//             name:bookDetails.title,
+//             description : `${bookDetails.author} | ${bookDetails.publisher}`,
+//             images:[bookDetails.imageUrl],
+//             metadata:{
+//         title:bookDetails.title,
+//         author:bookDetails.author,
+//         noofpages:bookDetails.noofpages,
+//         imageUrl:bookDetails.imageUrl,
+//         price:bookDetails.price,
+//         dprice:bookDetails.dprice,
+//         abstract:bookDetails.abstract,
+//         publisher:bookDetails.publisher,
+//         language:bookDetails.language,
+//         isbn:bookDetails.isbn,
+//         category:bookDetails.category, 
+//         UploadedImages:bookDetails.UploadedImages,
+//         status:'sold',
+//         userMail:bookDetails.userMail,
+//         brought:email
+//             }
+//           },
+//           //doller convertion
+//           unit_amount:Math.round(bookDetails.dprice*100)
+//         },
+//           quantity:1
+//       }]
+
+//       //create stripe checkout session
+//      const session = await stripe.checkout.sessions.create({
+//         //purchase using card
+//          payment_method_types: ["card"],
+//          //details of Book
+//          line_items: line_item,
+//           //make payment
+//           mode: "payment",
+//           //if payment is successfull, then redired to payment success
+//           success_url: 'https://bookstore-frontend-mar-25.vercel.app/payment-success',
+//         //if payment is unsuccessfull, then redired to payment error
+//           cancel_url:'https://bookstore-frontend-mar-25.vercel.app/payment-error'
+        
+// });
+// console.log(session);
+//  res.status(200).json({sessionID:session.id,existingBook})
+
+//     }
+//        catch(err){
+//          console.error('Payment error:', err);
+//     res.status(500).json({ error: 'Payment processing failed' });
+//     //  res.status(500).json("Err"+err)
+//   }
     
 
-}
+// }
