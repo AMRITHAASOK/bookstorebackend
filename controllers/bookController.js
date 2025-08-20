@@ -178,9 +178,9 @@ exports.makepayment=async(req,res)=>{
           //make payment
           mode: "payment",
           //if payment is successfull, then redired to payment success
-          success_url: 'http://localhost:5173/payment-success',
+          success_url: 'https://bookstore-frontend-mar-25.vercel.app/payment-success',
         //if payment is unsuccessfull, then redired to payment error
-          cancel_url:'http://localhost:5173/payment-error'
+          cancel_url:'https://bookstore-frontend-mar-25.vercel.app/payment-error'
         
 });
 console.log(session);
